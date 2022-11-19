@@ -6,22 +6,57 @@
         </v-app-bar-nav-icon>
 
         <v-toolbar-title>
-          <router-link to="/"> Carpool </router-link>
+          <router-link class="text-white" to="/"> Carpool </router-link>
         </v-toolbar-title>
 
         <v-spacer></v-spacer>
 
-        <v-btn variant="text" icon="mdi-magnify"></v-btn>
+        <!-- login logout -->
+        <div class="d-flex flex-row-reverse">
+          <!-- <v-sheet class="ma-2 pa-2">
+            <v-card> -->
+          <v-tabs bg-color="primary">
+           <!-- logout user -->
+              <v-tab class="pa-0">
+                <router-link
+                  class="pt-4 pb-4 pl-6 pr-6 text-white d-block"
+                  to="/"
+                  @click="logOutUser"
+                >
+                  Log Out
+                </router-link>
+              </v-tab>
+            
+            <!-- only when login in -->
+            <div>
+              <v-tab class="pa-0">
+                <router-link
+                  class="pt-4 pb-4 pl-6 pr-6 text-white d-block"
+                  :to="login"
+                >
+                  Login
+                </router-link>
+              </v-tab>
+              <v-tab class="pa-0">
+                <router-link
+                  class="pt-4 pb-4 pl-6 pr-6 text-white d-block"
+                  :to="signup"
+                >
+                  SignUp
+                </router-link>
+              </v-tab>
+            </div>
+          </v-tabs>
 
-        <v-btn variant="text" icon="mdi-filter"></v-btn>
+          <!-- </v-card>
+          </v-sheet> -->
+        </div>
 
         <v-btn variant="text" @click="threeDotsToggle" icon="mdi-dots-vertical">
         </v-btn>
       </v-app-bar>
 
       <v-navigation-drawer v-model="drawer" location="left" permanent>
-
-        
         <div class="d-flex flex-column">
           <router-link class="pa-4 d-block" :to="findRideLink">
             Find Ride
@@ -30,14 +65,16 @@
             Publish Ride
           </router-link>
           <router-link class="pa-4 d-block" :to="rideHistory">
-           Ride History
+            Ride History
           </router-link>
         </div>
       </v-navigation-drawer>
 
+      <!-- User Profile toggle-->
       <SideBar v-if="threeDotProfile" />
 
       <v-main>
+        <!-- root route component displayed here -->
         <router-view v-slot="slotProps">
           <transition name="route" mode="out-in">
             <component :is="slotProps.Component"></component>
@@ -56,6 +93,7 @@ export default {
     SideBar,
   },
   data: () => ({
+    tab: null, //login logout
     threeDotProfile: false,
     drawer: false,
     group: null,
@@ -66,6 +104,9 @@ export default {
     threeDotsToggle() {
       this.threeDotProfile = !this.threeDotProfile;
     },
+    logOutUser(){  //isAuth = false , token = null
+
+    }
   },
 
   watch: {
@@ -83,6 +124,12 @@ export default {
     },
     rideHistory() {
       return { name: "ride-history" };
+    },
+    login() {
+      return { name: "login" };
+    },
+    signup() {
+      return { name: "signup" };
     },
   },
 };
