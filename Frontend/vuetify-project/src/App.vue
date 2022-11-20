@@ -16,7 +16,17 @@
           <!-- <v-sheet class="ma-2 pa-2">
             <v-card> -->
           <v-tabs bg-color="primary">
-           <!-- logout user -->
+            <!-- logout user -->
+            <div v-if="getUserIsAuthenticated">
+              <v-tab class="pa-0">
+                <router-link
+                  class="pt-4 pb-4 pl-6 pr-6 text-white d-block"
+                  :to="publishRide"
+                >
+                  Publish Ride
+                </router-link>
+              </v-tab>
+
               <v-tab class="pa-0">
                 <router-link
                   class="pt-4 pb-4 pl-6 pr-6 text-white d-block"
@@ -26,9 +36,10 @@
                   Log Out
                 </router-link>
               </v-tab>
-            
+            </div>
+
             <!-- only when login in -->
-            <div>
+            <div v-else>
               <v-tab class="pa-0">
                 <router-link
                   class="pt-4 pb-4 pl-6 pr-6 text-white d-block"
@@ -74,12 +85,14 @@
       <SideBar v-if="threeDotProfile" />
 
       <v-main>
+        <!-- <div class=" bg-red"> -->
         <!-- root route component displayed here -->
         <router-view v-slot="slotProps">
           <transition name="route" mode="out-in">
             <component :is="slotProps.Component"></component>
           </transition>
         </router-view>
+        <!-- </div> -->
       </v-main>
     </v-layout>
   </v-card>
@@ -87,6 +100,7 @@
 
 <script>
 import SideBar from "./components/navigation/SideBar.vue";
+import { mapGetters } from "vuex";
 
 export default {
   components: {
@@ -104,9 +118,9 @@ export default {
     threeDotsToggle() {
       this.threeDotProfile = !this.threeDotProfile;
     },
-    logOutUser(){  //isAuth = false , token = null
-
-    }
+    logOutUser() {
+      this.$store.dispatch("logOutUser");
+    },
   },
 
   watch: {
@@ -116,6 +130,7 @@ export default {
   },
 
   computed: {
+    ...mapGetters(["getUserIsAuthenticated"]),
     findRideLink() {
       return { name: "find-ride" };
     },

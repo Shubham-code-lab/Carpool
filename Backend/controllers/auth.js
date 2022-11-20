@@ -11,12 +11,6 @@ exports.signup = (req, res, next)=>{
         error.data = errors.array();
         throw error;
     }
-    // console.log(req.body.firstName);
-    // console.log(req.body.email);
-    // console.log(req.body.dateOfBirth);
-    // console.log(req.body.password);
-    // console.log(req.body.lastName);
-    // console.log(req.body.gender);
     const firstName = req.body.firstName;
     const lastName = req.body.lastName;
     const email= req.body.email;

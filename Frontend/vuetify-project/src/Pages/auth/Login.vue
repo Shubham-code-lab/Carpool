@@ -1,5 +1,6 @@
 <template>
-  <v-form v-model="valid" class="h-screen">
+<div class="d-flex flex-column justify-center h-screen">
+  <v-form v-model="valid">
     <div class="h-75 d-flex align-center">
       <v-container class="w-50">
         <v-row rows="12" md="6">
@@ -26,11 +27,23 @@
           >
           </v-text-field>
         </v-row>
-        <v-btn color="blue darken-1" @click="submitForm"> Login </v-btn>
+        <v-btn color="blue darken-1 ma-4" @click="submitForm"> Login </v-btn>
         <!-- </v-row> -->
       </v-container>
+      <div class="text-center ma-2">
+        <!-- snackbar -->
+      <v-snackbar v-model="snackbar">
+        {{ snackbarText }}
+        <template v-slot:actions>
+          <v-btn color="pink" variant="text" @click="snackbar = false">
+            Close
+          </v-btn>
+        </template>
+      </v-snackbar>
+    </div>
     </div>
   </v-form>
+  </div>
 </template>
 
 <script>
@@ -47,23 +60,26 @@ export default {
       (v) => !!v || "Password is required",
       (v) => v.length >= 8 || "Password must be greater than >=8 characters",
     ],
+    snackbar: false,
+    snackbarText: "",
   }),
-  watch:{
-  },
+  watch: {},
   methods: {
     async submitForm() {
       if (this.valid) {
-        try{
-            await this.$store.dispatch("checkUserAuthentication", {email: this.email,password: this.password})
-            .then(result=>{
-                const isAuthenticated = this.$store.getters.getUserIsAuthenticated;
-                if(isAuthenticated)
-                    this.$router.push('/');
-            })
-        }
-        catch(error){
-            console.log("vue validation fail", error);
-        }
+        await this.$store
+          .dispatch("checkUserAuthentication", {
+            email: this.email,
+            password: this.password,
+          })
+          .then((result) => {
+            const isAuthenticated = this.$store.getters.getUserIsAuthenticated;
+            if (isAuthenticated) this.$router.push("/");
+          })
+          .catch((error) => {
+            this.snackbar = true;
+            this.snackbarText = error.message;
+          });
       }
     },
   },

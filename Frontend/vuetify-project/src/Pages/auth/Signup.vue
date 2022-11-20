@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <v-form v-model="valid" class="h-screen">
+  <div class="d-flex flex-column justify-center h-screen">
+    <v-form v-model="valid">
       <div class="h-100 d-flex align-center">
         <v-container class="w-50">
           <!-- <v-row> -->
@@ -72,7 +72,7 @@
             >
             </v-text-field>
           </v-row>
-          <v-btn color="blue darken-1" @click="submitForm"> Register </v-btn>
+          <v-btn color="blue darken-1 mt-4" @click="submitForm"> Register </v-btn>
           <!-- </v-row> -->
         </v-container>
       </div>
@@ -123,39 +123,28 @@ export default {
     snackbarText: ``,
   }),
   methods: {
-    submitForm() {
-      //check for date and valid
-      // console.log(this.firstName);
-      // console.log(this.lastName);
-      // console.log(this.email);
-      // console.log(this.password);
-      // console.log(this.gender);
-      // console.log(this.dateOfBirth);
-      // let temp = new Date(this.dateOfBirth);
-      // console.log(temp.toISOString());
-      // console.log(this.valid);
+    async submitForm() {
       if (!this.dateOfBirth || !this.valid) {
         this.snackbar = true;
         this.snackbarText = "Please enter valid data";
       } else {
-        try {
-          await this.$store
-            .dispatch("createUserAccount", {
-              firstName: this.firstName,
-              lastName: this.lastName,
-              email: this.email,
-              password: this.password,
-              gender: this.gender,
-              dateOfBirth: this.dateOfBirth,
-            })
-            .then((result) => {
-              // redirect to login
-              this.$router.push("/");
-            });
-        } catch (error) {
-          this.snackbar = true;
-          this.snackbarText = "Soething went wrong on server";
-        }
+        // try {
+        await this.$store
+          .dispatch("createUserAccount", {
+            firstName: this.firstName,
+            lastName: this.lastName,
+            email: this.email,
+            password: this.password,
+            gender: this.gender,
+            dateOfBirth: this.dateOfBirth,
+          })
+          .then((result) => {
+            this.$router.push("/login");
+          })
+          .catch((error) => {
+            this.snackbar = true;
+            this.snackbarText = error.message;
+          });
       }
     },
   },
@@ -163,4 +152,5 @@ export default {
 </script>
 
 <style scoped>
+
 </style>

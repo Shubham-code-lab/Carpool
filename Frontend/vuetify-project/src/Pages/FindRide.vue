@@ -1,5 +1,5 @@
 <template>
-  <h1>find ride</h1>
+  <h1>ride</h1>
 </template>
 
 <script>

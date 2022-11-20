@@ -1,9 +1,11 @@
 import { createStore } from "vuex";
+import driver from "./driver/index.js";
+import rider from "./rider/index.js";
 
 const store = createStore({
   modules: {
-    // coaches: coaches,
-    // requests
+    driver,
+    rider,
   },
   state() {
     return {
@@ -25,8 +27,22 @@ const store = createStore({
     getUserIsAuthenticated(state) {
       return state.isAuthenticated;
     },
+    rootGetter(state, getters, rootGetters, rootState) {
+      //remove
+      console.log("rootGetter state", state);
+      console.log("rootGetter state get module state", state.driver.d_totalTrips);
+      console.log("rootGetter getters", getters);
+      // console.log("rootGetter getters get module getter", getters['driver/driverGetter']);
+      console.log("rootGetter rootGetters", rootGetters.token);
+      console.log("rootGetter rootState", rootState);
+      return "rootGetter";
+    },
   },
   mutations: {
+    rootMutation(state, payLoad) {
+      //remove
+      console.log("rootMutation", state, payLoad);
+    },
     //state, payload
     updateUserIsAuthenticated(state, isAuthenticated) {
       state.isAuthenticated = isAuthenticated;
@@ -44,8 +60,21 @@ const store = createStore({
         state.tokenExpiryDate
       );
     },
+
+    logOutUser(state) {
+      localStorage.clear();
+      state.userId = undefined;
+      state.token = null;
+      state.tokenExpiryDate = null;
+      state.isAuthenticated = false;
+    },
   },
   actions: {
+    rootAction(context, payload) {
+      //remove
+      console.log("rootAction");
+      context.commit("rootMutation", context, payload);
+    },
     //context :-{state,getters,rootGetter,rootState,commit,dispatch}, payload
     updateUserIsAuthenticated(context, payLoad) {
       context.commit("updateUserIsAuthenticated", payLoad.isAuthenticated);
@@ -65,6 +94,9 @@ const store = createStore({
         .then((res) => {
           if (res.status === 422) {
             throw new Error("Validation failed.");
+          }
+          if (res.status === 500) {
+            throw new Error("something wrong on server");
           }
           if (res.status !== 200 && res.status !== 201) {
             console.log("Error!");
@@ -100,10 +132,11 @@ const store = createStore({
           });
         })
         .catch((err) => {
+          //isAuthetiction = false
           //   console.log(err);
           localStorage.clear();
           const error = new Error("authetication fail");
-          error.err = err;
+          error.message = err;
           throw error;
         });
     },
@@ -124,6 +157,12 @@ const store = createStore({
         }),
       })
         .then((res) => {
+          if (res.status === 422) {
+            throw new Error("Email Id already exist");
+          }
+          if (res.status === 500) {
+            throw new Error("something wrong on server");
+          }
           if (res.status !== 200 && res.status !== 201) {
             throw new Error("Signup fail");
           }
@@ -133,10 +172,14 @@ const store = createStore({
           console.log("Signup successfull");
         })
         .catch((err) => {
-            const error = new Error("account creation fail");
-            error.err = err;
-            throw error;
+          const error = new Error("account creation fail");
+          error.message = err;
+          throw error;
         });
+    },
+
+    logOutUser(context) {
+      context.commit("logOutUser");
     },
   },
 });
