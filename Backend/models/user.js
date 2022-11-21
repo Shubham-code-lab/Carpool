@@ -32,11 +32,11 @@ const userSchema = new Schema({
     },
     driverId:{
         type: Schema.Types.ObjectId,
-        ref: 'driver'
+        ref: 'Driver'
     },
     riderId:{
         type: Schema.Types.ObjectId,
-        ref: 'rider'
+        ref: 'Rider'
     }
 });
 

@@ -106,6 +106,9 @@ export default {
   components: {
     SideBar,
   },
+  created(){  
+    this.$store.dispatch('checkTokenExpire');
+  },
   data: () => ({
     tab: null, //login logout
     threeDotProfile: false,

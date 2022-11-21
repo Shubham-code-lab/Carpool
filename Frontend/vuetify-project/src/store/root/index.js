@@ -27,29 +27,15 @@ const store = createStore({
     getUserIsAuthenticated(state) {
       return state.isAuthenticated;
     },
-    rootGetter(state, getters, rootGetters, rootState) {
-      //remove
-      console.log("rootGetter state", state);
-      console.log("rootGetter state get module state", state.driver.d_totalTrips);
-      console.log("rootGetter getters", getters);
-      // console.log("rootGetter getters get module getter", getters['driver/driverGetter']);
-      console.log("rootGetter rootGetters", rootGetters.token);
-      console.log("rootGetter rootState", rootState);
-      return "rootGetter";
-    },
   },
   mutations: {
-    rootMutation(state, payLoad) {
-      //remove
-      console.log("rootMutation", state, payLoad);
-    },
     //state, payload
     updateUserIsAuthenticated(state, isAuthenticated) {
       state.isAuthenticated = isAuthenticated;
     },
     checkUserAuthentication(state, payLoad) {
       state.token = payLoad.token;
-      state.userId = payLoad.userId;
+      state.userId = payLoad.userId ? payLoad.userId : state.userId;
       state.isAuthenticated = payLoad.isAuthenticated;
       state.tokenExpiryDate = payLoad.tokenExpiryDate;
       console.log(
@@ -68,13 +54,13 @@ const store = createStore({
       state.tokenExpiryDate = null;
       state.isAuthenticated = false;
     },
+
+    checkTokenExpire(state, payload){
+      
+    }
+
   },
   actions: {
-    rootAction(context, payload) {
-      //remove
-      console.log("rootAction");
-      context.commit("rootMutation", context, payload);
-    },
     //context :-{state,getters,rootGetter,rootState,commit,dispatch}, payload
     updateUserIsAuthenticated(context, payLoad) {
       context.commit("updateUserIsAuthenticated", payLoad.isAuthenticated);
@@ -95,12 +81,18 @@ const store = createStore({
           if (res.status === 422) {
             throw new Error("Validation failed.");
           }
-          if (res.status === 500) {
+          if (res.status === 204) {
+            throw new Error("Email id doesn't exist");
+          }
+          if (res.status === 401) {
+            throw new Error("Could not authenticate you!");
+          }
+          if (res.status === 500) { 
             throw new Error("something wrong on server");
           }
           if (res.status !== 200 && res.status !== 201) {
             console.log("Error!");
-            throw new Error("Could not authenticate you!");
+            throw new Error("unExpected Error!");
           }
           return res.json();
         })
@@ -134,7 +126,7 @@ const store = createStore({
         .catch((err) => {
           //isAuthetiction = false
           //   console.log(err);
-          localStorage.clear();
+          // localStorage.clear();
           const error = new Error("authetication fail");
           error.message = err;
           throw error;
@@ -158,13 +150,13 @@ const store = createStore({
       })
         .then((res) => {
           if (res.status === 422) {
-            throw new Error("Email Id already exist");
+            throw new Error("Validation Fail Email Id already exist");
           }
           if (res.status === 500) {
             throw new Error("something wrong on server");
           }
           if (res.status !== 200 && res.status !== 201) {
-            throw new Error("Signup fail");
+            throw new Error("unExpected Error!");
           }
           return res.json();
         })
@@ -181,6 +173,29 @@ const store = createStore({
     logOutUser(context) {
       context.commit("logOutUser");
     },
+
+    checkTokenExpire(context){
+      const token = localStorage.getItem('token');
+      const tokenExpiryDate = localStorage.getItem('tokenExpiryDate');
+
+      if(!context.state.token && !token){  //token not exist
+        context.commit("logOutUser");
+        return;
+      }
+      if(token && tokenExpiryDate){ //token on localStorage
+        context.state.token = token;
+        context.state.tokenExpiryDate = new Date(tokenExpiryDate);
+        console.log("token expire on",new Date(tokenExpiryDate)); 
+        if(new Date().getTime() < context.state.tokenExpiryDate.getTime()){ //token expire
+          context.commit("checkUserAuthentication", {
+            token,
+            userId: null,
+            isAuthenticated: true,
+            tokenExpiryDate : context.state.tokenExpiryDate,
+          });
+        }
+      }
+    }
   },
 });
 

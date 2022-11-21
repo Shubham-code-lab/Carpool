@@ -11,15 +11,18 @@ const driverSchema = new Schema({
         type: Number,
         default: 0
     },
-    feedBack:{
-        type: String
-    },
+    feedBack:[
+        {
+            type: String
+        }
+    ],
     totalTrips:{
         type: Number
     },
-    vehical:[
+    vehicals:[
         {
-            type: Schema.Types.ObjectId
+            type: Schema.Types.ObjectId,
+            ref: 'Vehical'
         }
     ],
 });

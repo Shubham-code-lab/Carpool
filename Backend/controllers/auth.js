@@ -1,7 +1,7 @@
 const User = require('../models/user');
 const {validationResult} = require('express-validator/check');
 const bcrypt = require('bcryptjs');
- const jwt = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
 
 exports.signup = (req, res, next)=>{
     const errors = validationResult(req);
@@ -51,7 +51,7 @@ exports.login = (req, res, next)=>{
     .then(user=>{
         if(!user){    //TODO :- reductancy routes already check
             const error = new Error('A user with this email could not be found');
-            error.statusCode = 401;
+            error.statusCode = 204;
             throw error;
         }
         loadedUser = user;
@@ -59,7 +59,7 @@ exports.login = (req, res, next)=>{
     })
     .then(areMatch=>{
         if(!areMatch){
-            const error = new Error('A user with this email could not be found');
+            const error = new Error('A fail to authenticate you');
             error.statusCode = 401;
             throw error;
         }
