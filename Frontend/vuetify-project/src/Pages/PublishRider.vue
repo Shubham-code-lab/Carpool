@@ -19,7 +19,7 @@
                 <div>
                   <p class="font-weight-medium text-center">Total Seat</p>
                   <p class="font-weight-light text-center">
-                    {{ vehical.totalSeat }}
+                    {{ vehical.seats }}
                   </p>
                 </div>
                 <v-divider vertical></v-divider>
@@ -44,8 +44,20 @@
           @click="toggleAddVehicalMethod"
         >
         </v-btn>
+
+        <div class="text-center ma-2">
+          <v-snackbar v-model="snackbar">
+            {{ snackbarText }}
+            <template v-slot:actions>
+              <v-btn color="pink" variant="text" @click="snackbar = false">
+                Close
+              </v-btn>
+            </template>
+          </v-snackbar>
+        </div>
       </div>
     </div>
+
     <div class="w-100">
       <router-view></router-view>
     </div>
@@ -53,42 +65,61 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex";
+
 export default {
   data() {
     return {
-      vehicals: [
-        {
-          _id: 3545,
-          brand: "Toyota",
-          model: "cruser",
-          totalSeat: 4,
-          registrationNumber: "343tdfgrt4",
-        },
-        {
-          _id: 35467,
-          brand: "Suzuki",
-          model: "Maruti",
-          totalSeat: 4,
-          registrationNumber: "343tdfgrt4",
-        },
-      ],
+      vehicals: [],
       toggleAddVehical: false,
+      snackbar: false,
+      snackbarText: ``,
     };
   },
+
+  async created() {
+    console.log("publish rider created");
+    await this.$store
+      .dispatch("driver/callSetVehicals")
+      .then((result) => {
+        this.vehicals = this.getVehicals;
+      })
+      .catch((err) => {
+        console.log("fail to get vehicals", err);
+      });
+    // if(this.getToken){   //action :- get data from serve //mutation set data to vehical of vuex store driver module
+    //     await this.$store.dispatch('driver/setVehicals', {token : this.getToken})
+    //     .then(result=>{
+    //       this.vehicals = this.getVehicals;
+    //     })
+    //     .catch(err=>{
+    //       console.log("cannot fetch vehicals from server");
+    //     })
+    //   }
+  },
+
   methods: {
     toggleAddVehicalMethod() {
+      if (!this.getUserIsAuthenticated) {
+        console.log("toggleAddVehicalMethod not auth");
+        this.snackbar = true;
+        this.snackbarText = "You Need to login first";
+      }
+
       this.toggleAddVehical = !this.toggleAddVehical;
-      if(this.toggleAddVehical)
-        this.$router.push({name: "add-vehical"});
-      else this.$router.push({name: "publish-ride"});
+      if (this.toggleAddVehical) this.$router.push({ name: "add-vehical" });
+      else this.$router.push({ name: "publish-rider" });
     },
   },
-  computed:{
-    btnIcon(){
-      if(this.toggleAddVehical)return "mdi-minus"
+
+  computed: {
+    ...mapGetters(["getUserId", "getToken", "getUserIsAuthenticated"]),
+    ...mapGetters("driver", ["getVehicals"]),
+    btnIcon() {
+      if (this.toggleAddVehical) return "mdi-minus";
       else return "mdi-plus";
-    }
-  }
+    },
+  },
 };
 </script>
 

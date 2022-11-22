@@ -1,6 +1,7 @@
 const User = require("../models/user");
 const Driver = require("../models/driver");
 const Vehical = require("../models/vehical");
+const vehical = require("../models/vehical");
 
 exports.addVehicals = (req, res, next) => {
   console.log("addVehical");
@@ -40,7 +41,8 @@ exports.addVehicals = (req, res, next) => {
       existingUser
         .save()
         .then((user) => {
-          const vehical = new Vehical({    //TODO:- registration is unique
+          const vehical = new Vehical({
+            //TODO:- registration is unique
             //create new vehical
             driverId: driver._id, //update driver_id in Vehical model
             brand,
@@ -55,7 +57,7 @@ exports.addVehicals = (req, res, next) => {
               return driver.save();
             })
             .then((driver) => {
-              res.status(201).json({message: 'Vehical added'}); //TODO :- return driver id and other thind
+              res.status(201).json({ message: "Vehical added" }); //TODO :- return driver id and other thind
             })
             .catch((err) => {
               console.log(err);
@@ -77,5 +79,53 @@ exports.addVehicals = (req, res, next) => {
         err.statusCode = 500;
       }
       next(err);
+    });
+};
+
+exports.getVehicals = (req, res, next) => {
+  //statusCode  500,204 = vehical empty //302 = send vehical
+  console.log("getvehicals");
+  const userId = req.userId;
+  User.findById(userId)
+    .then((user) => {
+      //user.driverId = null, vehical
+      if (!user || !user.driverId) {
+        //set vehical empty
+        res.status(204).json({ vehicals: [] });
+        throw new Error("No Vehicals");
+      }
+      return Driver.findById(user.driverId);
+    })
+    .then((driver) => {
+      if (!driver) {
+        //set vehical empty
+        res.status(204).json({ vehicals: [] });
+        throw new Error("No Vehicals");
+      }
+      return Vehical.find({ driverId: driver._id });
+    })
+    .then((vehicals) => {
+      if (!vehicals || vehicals.length <= 0) {
+        res.status(204).json({ vehicals: [] });
+        throw new Error("No Vehicals");
+      }
+      //vehicals
+      // let simplifyVehicals = [
+      //   ...vehicals.map(vehical=>{
+      //     return {
+      //       ...vehical,
+      //       _id: vehical._id.toString(),
+      //       driverId: vehical.vehical.toString()
+      //     }
+      //   })
+      // ]
+      // console.log(simplifyVehicals);
+      res.status(302).json({vehicals});
+    })
+    .catch((err) => {
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      // next(err);
     });
 };

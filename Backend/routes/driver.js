@@ -7,4 +7,6 @@ const router = express.Router();
 
 router.post('/addVehical', auth, driver.addVehicals);
 
+router.get('/getVehicals', auth, driver.getVehicals);
+
 module.exports = router;

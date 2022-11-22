@@ -1,3 +1,5 @@
+import { RESOLVE_COMPONENT } from "@vue/compiler-core";
+
 const driver = {
   namespaced: true,
   state() {
@@ -5,22 +7,79 @@ const driver = {
       driverId: null,
       rating: null,
       feedBack: [], //string
-      totalTrips: 56564,
-      vehical: [{}],
+      totalTrips: 0,
+      vehicals: [],
     };
   },
-  getters: {},
-  mutations: {},
+  getters: {
+    getVehicals(state) {
+      return state.vehicals;
+    },
+  },
+  mutations: {
+    setVehicals(state, payLoad) {
+      //set vehical to vuex store driver module state:-vehicals
+      state.vehicals = payLoad.vehicals;
+      if (state.vehicals && state.vehicals[0] && state.vehicals[0].driverId)
+        state.driverId = state.vehicals[0].driverId;
+      console.log("driver id  and vehicals", state.driverId, state.vehicals);
+    },
+  },
   actions: {
+    async callSetVehicals(context) {
+      const token = context.rootGetters.getToken;
+      if (token) {
+        //action :- get data from serve //mutation set data to vehical of vuex store driver module
+        await context
+          .dispatch("setVehicals", { token })
+          .then((result) => {
+            console.log("successfull callSetVehicals");
+          })
+          .catch((err) => {
+            const error = new Error("cannot fetch vehicals from server");
+            error.err = err;
+            throw error;
+          });
+      }
+    },
+
+    async setVehicals(context, payLoad) {
+      //get vehical from server
+      console.log("payload token set vehical", payLoad.token);
+      await fetch("http://localhost:8080/driver/getVehicals", {
+        method: "Get",
+        headers: {
+          Authorization: "Bearer " + payLoad.token,
+        },
+      })
+        .then((res) => {
+          console.log("get vehical response", res.status);
+          if (res.status == 204 || res.status == 500) {
+            console.log("No vehicals");
+            return res.json();
+          }
+          if (res.status == 302) {
+            console.log("retrived vehicals");
+            return res.json();
+          }
+        })
+        .then((resData) => {
+          context.commit("setVehicals", { vehicals: resData.vehicals });
+        })
+        .catch((err) => {
+          console.log("get vehical error", err);
+        });
+    },
 
     async addVehical(context, payLoad) {
+      //add vehical to server
       //TODO
       console.log("payload", payLoad.token);
       await fetch("http://localhost:8080/driver/addVehical", {
         method: "POST",
         headers: {
           Authorization: "Bearer " + payLoad.token,
-          'Content-Type' : 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ ...payLoad }),
       })
@@ -44,7 +103,12 @@ const driver = {
           return res.json();
         })
         .then((resData) => {
-          console.log("created");   //TODO:- retrive vehical data
+          console.log("created"); //TODO:- retrive vehical data
+        })
+        .catch((err) => {
+          const error = new Error("fail to add vehical");
+          error.message = err;
+          throw error;
         });
     },
   },

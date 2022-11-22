@@ -194,6 +194,9 @@ const store = createStore({
             tokenExpiryDate : context.state.tokenExpiryDate,
           });
         }
+        else{
+          context.commit("logOutUser");
+        }
       }
     }
   },

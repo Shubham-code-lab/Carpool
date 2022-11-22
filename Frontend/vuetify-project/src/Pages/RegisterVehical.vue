@@ -1,5 +1,17 @@
 <template>
   <div class="">
+    <!-- snackbar -->
+    <div class="text-center ma-2">
+      <v-snackbar v-model="snackbar">
+        {{ snackbarText }}
+        <template v-slot:actions>
+          <v-btn color="pink" variant="text" @click="snackbar = false">
+            Close
+          </v-btn>
+        </template>
+      </v-snackbar>
+    </div>
+
     <div class="text-h4 text-center pa-5">Add new Vehical</div>
     <v-form v-model="valid">
       <div class="h-100 d-flex align-center">
@@ -88,27 +100,35 @@ export default {
         (v) => !!v || "Model is required",
         (v) => v.length >= 1 || "Model must be greater than a characters",
       ],
+      seatsRules: [
+        (v) => v == 0 || "Enter total seats in vehical",
+        (v) => (v<=8) && (v=>1) || "Vehical with only 1-8 seats can be register",
+      ],
+      snackbar: false,
+      snackbarText: ``,
     };
   },
 
-  methods: {
+  computed:{
     ...mapGetters(["getUserId", "getToken", "getUserIsAuthenticated"]),
-
+  },
+  methods: {
+    
     async submitForm() {
-      //check token expiry
-      this.$store.dispatch('checkTokenExpire');
-      
-      // console.log("skfdklgdgk", this.$store.state.token);
-      // console.log("skfdklgdgk", this.getToken());
-
-      if (this.getUserIsAuthenticated()) {
-        console.log("hii");
+      if(!this.valid || this.seats < 1 || this.seats > 8){
+         this.snackbar = true;
+        this.snackbarText = "Please enter valid data";
+        return;
+      }
+    
+      this.$store.dispatch('checkTokenExpire');     
+       if (this.getUserIsAuthenticated) {
         await this.$store.dispatch("driver/addVehical", {
           brand: this.brand,
           model: this.model,
           registrationNumber: this.registrationNumber,
           seats: this.seats,
-          token: this.getToken()
+          token: this.getToken
         })
         .then(result=>{
           console.log("vehical added");
@@ -118,7 +138,8 @@ export default {
           });
       }
       else{
-        console.log("is aAuthenticatio  is fals");
+        this.snackbar = true;
+        this.snackbarText = "You Need to login first";
         //user not authenticated
       }
     },
