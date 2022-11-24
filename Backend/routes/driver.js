@@ -9,4 +9,6 @@ router.post('/addVehical', auth, driver.addVehicals);
 
 router.get('/getVehicals', auth, driver.getVehicals);
 
+router.post('/addTrip', auth, driver.addTrip)
+
 module.exports = router;

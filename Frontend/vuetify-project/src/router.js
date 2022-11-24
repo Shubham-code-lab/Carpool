@@ -2,18 +2,21 @@ import { createRouter, createWebHistory } from 'vue-router';
 import NotFound from './Pages/NotFound.vue';
 import Home from './Pages/Home.vue';
 import FindRide from './Pages/FindRide.vue';
-import PublishRider from './Pages/PublishRider.vue';
+import PublishRide from './Pages/PublishRide.vue';
 import RideHistory from './Pages/RideHistory.vue';
 import Login from './Pages/auth/Login.vue';
 import Signup from './Pages/auth/Signup.vue';
 import AddVehical from  './Pages/RegisterVehical.vue';
+import RegisterTrip from './Pages/RegisterTrip.vue';
 
 const routes = createRouter({
     history: createWebHistory(),
     routes: [
         {path: '/', name:"home" ,component: Home },
+        {path: '/signup', name:'signup', component: Signup},
+        {path: '/login', name:'login', component: Login},
         {path: '/findRide', name:"find-ride", component: FindRide,},
-        {path: '/publishRider', name:"publish-rider", component: PublishRider,
+        {path: '/publishRide', name:"publish-ride", component: PublishRide,
          children: [
                 {
                 name: 'add-vehical',
@@ -22,9 +25,8 @@ const routes = createRouter({
                 },
             ]
         },
+        {path: '/reisterTrip/:vehicalId', name:'register-trip', component: RegisterTrip, props: true},
         {path: '/rideHistory', name:'ride-history', component: RideHistory},
-        {path: '/login', name:'login', component: Login},
-        {path: '/signup', name:'signup', component: Signup},
         {path: '/:notFound(.*)', component: NotFound},
     ],
 });

@@ -54,7 +54,7 @@
           </v-row>
 
           <v-row rows="12" md="2">
-            <!-- email -->
+            <!-- seats -->
             <v-text-field
               v-model="seats"
               type="Number"
@@ -65,6 +65,7 @@
             >
             </v-text-field>
           </v-row>
+
           <div class="d-flex flex-column align-center">
             <v-btn color="blue darken-1 mt-4" @click="submitForm">
               Register
@@ -87,7 +88,7 @@ export default {
       brand: "",
       model: "",
       registrationNumber: "",
-      seats: 0,
+      seats: 1,
       brandRules: [
         (v) => !!v || "Brand is required",
         (v) => v.length >= 1 || "Brand must be greater than a characters",

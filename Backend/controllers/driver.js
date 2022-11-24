@@ -2,6 +2,7 @@ const User = require("../models/user");
 const Driver = require("../models/driver");
 const Vehical = require("../models/vehical");
 const vehical = require("../models/vehical");
+const AvailableTrip = require("../models/availableTrip");
 
 exports.addVehicals = (req, res, next) => {
   console.log("addVehical");
@@ -109,23 +110,121 @@ exports.getVehicals = (req, res, next) => {
         res.status(204).json({ vehicals: [] });
         throw new Error("No Vehicals");
       }
-      //vehicals
-      // let simplifyVehicals = [
-      //   ...vehicals.map(vehical=>{
-      //     return {
-      //       ...vehical,
-      //       _id: vehical._id.toString(),
-      //       driverId: vehical.vehical.toString()
-      //     }
-      //   })
-      // ]
-      // console.log(simplifyVehicals);
-      res.status(302).json({vehicals});
+      res.status(302).json({ vehicals });
     })
     .catch((err) => {
       if (!err.statusCode) {
         err.statusCode = 500;
       }
       // next(err);
+    });
+};
+
+exports.addTrip =(req, res, next) => {
+  const userId = req.userId;
+  const fromLocationName = req.body.fromLocationName;
+  const toLocationName = req.body.toLocationName;
+  const tripDateTime = new Date(req.body.tripDateTime);
+  const availableSeats = req.body.availableSeats;
+  const pricePerSeat = req.body.pricePerSeat;
+  const vehicalId = req.body.vehicalId;
+
+  console.log("Register Trip data");
+  console.log(fromLocationName);
+  console.log(toLocationName);
+  console.log(tripDateTime);
+  console.log(tripDateTime.toString());
+  console.log(new Date(tripDateTime).toString());
+  console.log(availableSeats);
+  console.log(pricePerSeat);
+
+  //vehical not present in the Vehical collection
+
+
+  User.findById(userId)
+    .then((user) => {
+      if (!user) {
+        const error = new Error("A user does not exist");
+        error.statusCode = 403;
+        throw error;
+      }
+      return Driver.findById(user.driverId);
+    })
+    .then((driver) => {
+      if (!driver) {
+        const error = new Error("A user is not a driver driverID null");
+        error.statusCode = 403;
+        throw error;
+      }
+      else if (
+        driver.vehicals.find(
+          (vehicalId) => vehicalId.toString() === vehicalId.toString()
+        )
+      )
+        return Vehical.findById(vehicalId);
+      else {
+        const error = new Error("Vehical id doesn't belong to user");
+        error.statusCode = 403;
+        throw error;
+      }
+    })
+    .then((vehical) => {
+      if(!vehical){
+        const error = new Error("vehical not present in the Vehical collection");
+        error.statusCode = 403;
+        throw error;
+      }
+      return AvailableTrip.find({driverId:vehical.driverId})
+      .then(ExistingAvailableTrips=>{
+        if(!ExistingAvailableTrips){
+          const error = new Error("No scheduled trip data available collection");
+          error.statusCode = 403;
+          throw error;
+        }
+        let validDate = true;
+        ExistingAvailableTrips.forEach(existingAvailableTrip=>{
+          const existingTripDate = (new Date(existingAvailableTrip.tripDateTime).getTime());
+          const oneDay = 1000*60*60*24;
+          if(!(((+tripDateTime.getTime())+(oneDay)) > (+existingTripDate.getTime()) &&  ((+tripDateTime.getTime())-(oneDay)) < (+existingTripDate.getTime()))){
+            validDate = false;
+            console.log("new Date is fall on already schedule trip date day");
+          }
+          else{
+            console.log(console.log("new date is samller and bigger than existingAvailableTrip by 1 day",existingAvailableTrip));
+          }
+        })
+
+        if(validDate){
+          const availableTrip = new AvailableTrip({
+            driverId:vehical.driverId,
+            vehicalId,
+            fromLocationName,
+            toLocationName,
+            tripDateTime,
+            availableSeats,
+            pricePerSeat,
+          });
+          return availableTrip.save();
+        }
+        else{
+          const error = new Error("already  schdule pick another  date");
+          error.statusCode = 403;
+          throw error;
+        }
+      })
+      .catch(err=>{
+        const error = new Error("ExistingAvailableTrips server error");
+        error.statusCode = 500;
+        throw error;
+      })
+    })
+    .then(newTripData=>{
+      res.status(200).json({message:'trip added successfully'});
+    })
+    .catch((err) => {
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
     });
 };

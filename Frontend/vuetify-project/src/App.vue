@@ -138,7 +138,7 @@ export default {
       return { name: "find-ride" };
     },
     publishRide() {
-      return { name: "publish-rider" };
+      return { name: "publish-ride" };
     },
     rideHistory() {
       return { name: "ride-history" };

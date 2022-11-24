@@ -26,21 +26,51 @@ const driver = {
     },
   },
   actions: {
-    async callSetVehicals(context) {
-      const token = context.rootGetters.getToken;
-      if (token) {
-        //action :- get data from serve //mutation set data to vehical of vuex store driver module
-        await context
-          .dispatch("setVehicals", { token })
-          .then((result) => {
-            console.log("successfull callSetVehicals");
-          })
-          .catch((err) => {
-            const error = new Error("cannot fetch vehicals from server");
-            error.err = err;
-            throw error;
-          });
-      }
+    // async callSetVehicals(context) {
+    //   const token = context.rootGetters.getToken;
+    //   if (token) {
+    //     //action :- get data from serve //mutation set data to vehical of vuex store driver module
+    //     await context
+    //       .dispatch("setVehicals", { token })
+    //       .then((result) => {
+    //         console.log("successfull callSetVehicals");
+    //       })
+    //       .catch((err) => {
+    //         const error = new Error("cannot fetch vehicals from server");
+    //         error.err = err;
+    //         throw error;
+    //       });
+    //   }
+    // },
+
+    async addTrip(context, payLoad){
+      await fetch("http://localhost:8080/driver/addTrip", {
+        method: "POST",
+        headers: {
+          Authorization: "Bearer " + payLoad.token,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ...payLoad }),
+      })
+      .then(res=>{
+        if(res.status === 403){
+          throw new Error("Data provided doesn't belong to user");
+        }
+        else if(res.status === 500){
+          throw new Error("Something wrong on server");
+        }
+        else if(res.status !== 200 || res.status !== 201){
+          throw new Error("add trip request failed");
+        }
+        return res.json();
+      })
+      .then(resData=>{
+        console.log("Trip added successfully");
+      })
+      .catch(err=>{
+        console.log(err);
+        throw err;
+      })
     },
 
     async setVehicals(context, payLoad) {

@@ -32,6 +32,16 @@
                   </p>
                 </div>
               </div>
+              <!-- button delete and select -->
+              <div class="d-flex justify-space-around ma-4">
+                <div>
+                  <v-btn color="green darken-3" @click="selectVehical(vehical._id)"> Select </v-btn>
+                </div>
+                <div>
+                  <v-btn color="red darken-2" @click="deleteVehical(vehical._id)"> Delete </v-btn>
+                </div>
+              </div>
+
             </v-card>
           </template>
         </v-hover>
@@ -78,27 +88,51 @@ export default {
   },
 
   async created() {
-    console.log("publish rider created");
-    await this.$store
-      .dispatch("driver/callSetVehicals")
-      .then((result) => {
-        this.vehicals = this.getVehicals;
-      })
-      .catch((err) => {
-        console.log("fail to get vehicals", err);
-      });
-    // if(this.getToken){   //action :- get data from serve //mutation set data to vehical of vuex store driver module
-    //     await this.$store.dispatch('driver/setVehicals', {token : this.getToken})
-    //     .then(result=>{
-    //       this.vehicals = this.getVehicals;
-    //     })
-    //     .catch(err=>{
-    //       console.log("cannot fetch vehicals from server");
-    //     })
-    //   }
+    // console.log("publish rider created");
+    //  this.$store
+    //   .dispatch("driver/callSetVehicals")
+    //   .then((result) => {
+    //     this.vehicals = this.getVehicals;
+    //   })
+    //   .catch((err) => {
+    //     console.log("fail to get vehicals", err);
+    //   });
+
+    this.setVehicals();
+  },
+
+  watch: {
+    //TODO:- watch a getter of driver module and update when changes
+    $route(newRoute) {
+      this.setVehicals();
+    },
   },
 
   methods: {
+
+    selectVehical(vehicalId){
+      console.log(vehicalId);
+      this.$router.push({name: 'register-trip', params:{vehicalId}});
+    },
+
+    deleteVehical(vehicalId){
+      console.log(vehicalId);
+    },
+
+    async setVehicals() {
+      if (this.getToken) {
+        //action :- get data from serve //mutation set data to vehical of vuex store driver module
+        await this.$store
+          .dispatch("driver/setVehicals", { token: this.getToken })
+          .then((result) => {
+            this.vehicals = this.getVehicals;
+          })
+          .catch((err) => {
+            console.log("cannot fetch vehicals from server");
+          });
+      }
+    },
+
     toggleAddVehicalMethod() {
       if (!this.getUserIsAuthenticated) {
         console.log("toggleAddVehicalMethod not auth");
