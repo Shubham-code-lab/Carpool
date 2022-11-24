@@ -53,7 +53,6 @@ const driver = {
         body: JSON.stringify({ ...payLoad }),
       })
       .then(res=>{
-        console.log(res.status);
         if(res.status == 403){
           throw new Error("Data provided doesn't belong to user");
         }
@@ -62,8 +61,7 @@ const driver = {
         }
         else if(res.status != 200 && res.status != 201){
           throw new Error("add trip request failed");
-        }
-        console.log(res.status);
+        }   
         return res.json();
       })
       .then(resData=>{
