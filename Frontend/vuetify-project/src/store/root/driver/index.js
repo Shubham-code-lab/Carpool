@@ -53,15 +53,17 @@ const driver = {
         body: JSON.stringify({ ...payLoad }),
       })
       .then(res=>{
-        if(res.status === 403){
+        console.log(res.status);
+        if(res.status == 403){
           throw new Error("Data provided doesn't belong to user");
         }
-        else if(res.status === 500){
+        else if(res.status == 500){
           throw new Error("Something wrong on server");
         }
-        else if(res.status !== 200 || res.status !== 201){
+        else if(res.status != 200 && res.status != 201){
           throw new Error("add trip request failed");
         }
+        console.log(res.status);
         return res.json();
       })
       .then(resData=>{
