@@ -18,9 +18,8 @@ const rider = {
        
     },
     actions: {
-        
-    },
-    
+      
+    }
   };
   
   export default rider;

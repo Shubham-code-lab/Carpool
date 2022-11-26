@@ -53,26 +53,25 @@ const driver = {
         body: JSON.stringify({ ...payLoad }),
       })
       .then(res=>{
-        if(res.status == 403){
-          throw new Error("Data provided doesn't belong to user");
+        if(res.status != 201){
+          const error = new Error("server error");
+          error.res = res;
+          throw error;
         }
-        else if(res.status == 500){
-          throw new Error("Something wrong on server");
-        }
-        else if(res.status != 200 && res.status != 201){
-          throw new Error("add trip request failed");
-        }   
         return res.json();
       })
       .then(resData=>{
         console.log("Trip added successfully");
       })
-      .catch(err=>{
-        console.log(err);
-        throw err;
+      .catch(error=>{
+        return error.res.json().then(errData=>{
+          throw new Error(errData.message);
+        })
       })
     },
 
+    
+    
     async setVehicals(context, payLoad) {
       //get vehical from server
       console.log("payload token set vehical", payLoad.token);

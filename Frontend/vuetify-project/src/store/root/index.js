@@ -14,6 +14,7 @@ const store = createStore({
       token: null,
       tokenExpiryDate: null,
       isAuthenticated: false,
+      availableTrips: []
     };
   },
   getters: {
@@ -27,6 +28,9 @@ const store = createStore({
     getUserIsAuthenticated(state) {
       return state.isAuthenticated;
     },
+    getAvailableTrips(state){
+      return state.availableTrips;
+    }
   },
   mutations: {
     //state, payload
@@ -53,6 +57,11 @@ const store = createStore({
       state.token = null;
       state.tokenExpiryDate = null;
       state.isAuthenticated = false;
+    },
+
+    setTrips(state, payLoad){
+        state.availableTrips = payLoad.availableTrips;
+        console.log("root mutation setTrips", state.availableTrips);
     },
 
     checkTokenExpire(state, payload){
@@ -198,7 +207,35 @@ const store = createStore({
           context.commit("logOutUser");
         }
       }
-    }
+    },
+
+    setTrips(context, payLoad) {
+      console.log("action setTrips", payLoad);
+      fetch("http://localhost:8080/rider/getTrips", {
+        method: "Get",
+        // headers: {
+        //   Authorization: "Bearer " + payLoad.token,
+        // },
+      })
+      .then(res=>{
+        if(res.status != 200){
+          const error = new Error("server error");
+          error.res = res;
+          throw error;
+        }
+        return res.json();
+      })
+      .then(resData=>{
+        console.log("Trip retrived successfully");
+        context.commit('setTrips', {availableTrips:resData.availableTrips});
+      })
+      .catch(error=>{
+        return error.res.json().then(errData=>{
+          throw new Error(errData.message);
+        })
+      })
+    },
+
   },
 });
 

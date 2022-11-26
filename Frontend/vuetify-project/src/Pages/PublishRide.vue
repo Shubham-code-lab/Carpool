@@ -142,7 +142,7 @@ export default {
 
       this.toggleAddVehical = !this.toggleAddVehical;
       if (this.toggleAddVehical) this.$router.push({ name: "add-vehical" });
-      else this.$router.push({ name: "publish-rider" });
+      else this.$router.push({ name: "publish-ride" });
     },
   },
 

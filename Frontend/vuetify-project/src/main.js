@@ -13,6 +13,9 @@ import store from './store/root/index.js';
 import Datepicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
 
+//Base Component
+// import BaseModel from './components/ui/BaseModel.vue';
+
 
 // Composables
 import { createApp } from 'vue'
@@ -27,6 +30,7 @@ const app = createApp(App)
 app.component('Datepicker', Datepicker);
 
 //BaseComponent
+// app.component('BaseModel', BaseModel);
 
 //router and store
 app.use(router);

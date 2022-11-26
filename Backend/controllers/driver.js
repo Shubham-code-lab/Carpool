@@ -1,7 +1,6 @@
 const User = require("../models/user");
 const Driver = require("../models/driver");
 const Vehical = require("../models/vehical");
-const vehical = require("../models/vehical");
 const AvailableTrip = require("../models/availableTrip");
 
 exports.addVehicals = (req, res, next) => {
@@ -130,19 +129,20 @@ exports.addTrip = (req, res, next) => {
   const availableSeats = req.body.availableSeats;
   const pricePerSeat = req.body.pricePerSeat;
   const vehicalId = req.body.vehicalId;
-
+  let firstName = "";
   User.findById(userId)
     .then((user) => {
       if (!user) {
-        const error = new Error("A user does not exist");
+        const error = new Error("user does not exist in collection");
         error.statusCode = 403;
         throw error;
       }
+      firstName = user.firstName;
       return Driver.findById(user.driverId);
     })
     .then((driver) => {
       if (!driver) {
-        const error = new Error("A user is not a driver driverID null");
+        const error = new Error("user is not a driver");
         error.statusCode = 403;
         throw error;
       } else if (
@@ -152,7 +152,7 @@ exports.addTrip = (req, res, next) => {
       ) {
         return Vehical.findById(vehicalId);
       } else {
-        const error = new Error("Vehical id doesn't belong to user");
+        const error = new Error("Vehical doesn't belong to driver");
         error.statusCode = 403;
         throw error;
       }
@@ -175,7 +175,7 @@ exports.addTrip = (req, res, next) => {
             throw error;
           }
           let validDate = true;
-          let temp = [...existingAvailableTrips];
+          let temp = [...existingAvailableTrips];    //mongoose return live document //so to prevent it :- it add new shedule and then loop that new schedule
           temp.forEach((existingAvailableTrip) => {
             let existingTripDateMilliSecond = new Date(
               existingAvailableTrip.tripDateTime
@@ -195,6 +195,7 @@ exports.addTrip = (req, res, next) => {
             const availableTrip = new AvailableTrip({
               driverId: vehical.driverId,
               vehicalId,
+              firstName,
               fromLocationName,
               toLocationName,
               tripDateTime,
@@ -203,21 +204,26 @@ exports.addTrip = (req, res, next) => {
             });
             return availableTrip.save();
           } else {
-            const error = new Error("already  schdule pick another  date");
+            const error = new Error("PLease pick another date you have already have a trip schedule on corresponding date");
             error.statusCode = 403;
             throw error;
           }
         })
         .catch((err) => {
-          const error = new Error("ExistingAvailableTrips server error");
-          error.statusCode = 500;
-          throw error;
+          console.log(err.statusCode);
+          if (!err.statusCode) {
+            const err = new Error("ExistingAvailableTrips server error");
+            err.statusCode = 500;
+            throw err;
+          }else
+          throw err;
         });
     })
     .then((newTripData) => {
-      res.status(200).json({ message: "trip added successfully" });
+      res.status(201).json({ message: "trip added successfully" });
     })
     .catch((err) => {
+      console.log(err.statusCode);
       if (!err.statusCode) {
         err.statusCode = 500;
       }

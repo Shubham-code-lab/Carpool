@@ -80,6 +80,8 @@
         </template>
       </v-snackbar>
     </div>
+
+    
   </div>
 </template>
 
@@ -116,6 +118,7 @@ export default {
     tripDateTime: null,
     snackbar: false,
     snackbarText: ``,
+    dialog: false,
   }),
 
   computed: {
@@ -155,9 +158,12 @@ export default {
           })
           .then((result) => {
             console.log("Trip added");
+            this.dialog = false;
           })
           .catch((err) => {
             console.log("can't add trip", err);
+            this.snackbar = true;
+            this.snackbarText = err;
           });
       } else {
         this.snackbar = true;
