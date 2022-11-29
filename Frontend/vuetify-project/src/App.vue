@@ -108,19 +108,7 @@ export default {
   },
   created(){  
     this.$store.dispatch('checkTokenExpire');
-    //retriving trips
-    this.$store
-      .dispatch("setTrips", { token: this.getToken })
-      .then((result) => {
-        console.log("Trip retrived");
-        // this.availableTrips = this.getAvailableTrips;
-        // console.log("findRide", this.availableTrips);
-      })
-      .catch((err) => {
-        console.log("can't retrived Trip", err);
-        this.snackbar = true;
-        this.snackbarText = err;
-      });
+    
   },
   data: () => ({
     tab: null, //login logout

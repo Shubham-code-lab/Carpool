@@ -209,13 +209,14 @@ const store = createStore({
       }
     },
 
-    setTrips(context, payLoad) {
+    async setTrips(context,payLoad) {
       console.log("action setTrips", payLoad);
-      fetch("http://localhost:8080/rider/getTrips", {
-        method: "Get",
-        // headers: {
-        //   Authorization: "Bearer " + payLoad.token,
-        // },
+      await fetch("http://localhost:8080/rider/getTrips", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body:JSON.stringify({...payLoad})
       })
       .then(res=>{
         if(res.status != 200){
@@ -230,6 +231,7 @@ const store = createStore({
         context.commit('setTrips', {availableTrips:resData.availableTrips});
       })
       .catch(error=>{
+        console.log(error);
         return error.res.json().then(errData=>{
           throw new Error(errData.message);
         })
