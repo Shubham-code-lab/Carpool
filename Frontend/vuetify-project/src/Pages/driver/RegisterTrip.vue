@@ -31,9 +31,18 @@
           <v-row rows="12" md="2">
             <!-- dob -->
             <v-row class="pb-9 pt-2">
-              <label class="pl-5">Date of Trip:-</label>
+              <label class="pl-5">Trip Start time:-</label>
 
               <Datepicker class="pl-4" v-model="tripDateTime"></Datepicker>
+            </v-row>
+          </v-row>
+
+          <v-row rows="12" md="2">
+            <!-- dob -->
+            <v-row class="pb-9 pt-2">
+              <label class="pl-5">Trip End time:-</label>
+
+              <Datepicker class="pl-4" v-model="tripEndDateTime"></Datepicker>
             </v-row>
           </v-row>
 
@@ -116,6 +125,7 @@ export default {
       (v) => v.length <= 20 || "Location must be less than 20 characters",
     ],
     tripDateTime: null,
+    tripEndDateTime: null,
     snackbar: false,
     snackbarText: ``,
     dialog: false,
@@ -130,6 +140,11 @@ export default {
       if (!this.valid || this.availableSeats < 1 || this.availableSeats > 8) {
         this.snackbar = true;
         this.snackbarText = "Please enter valid data";
+        return;
+      }
+      if((+(new Date().getTime()) + 1000*60*60*2) > +(new Date(this.tripDateTime).getTime())){
+        this.snackbar = true;
+        this.snackbarText = "Please enter valid date";
         return;
       }
 
@@ -151,6 +166,7 @@ export default {
             fromLocationName: this.fromLocationName,
             toLocationName: this.toLocationName,
             tripDateTime: this.tripDateTime.toISOString(),
+            tripEndDateTime: this.tripEndDateTime.toISOString(),
             availableSeats: this.availableSeats,
             pricePerSeat: this.pricePerSeat,
             token: this.getToken,

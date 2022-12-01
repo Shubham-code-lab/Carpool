@@ -209,11 +209,28 @@
                   }}
                 </div>
               </div>
+              <div class="d-flex flex-row justify-space-between">
+                <div class="pl-5 text-subtitle-2">
+                  {{
+                    new Date(tripDetail.tripEndDateTime)
+                      .toLocaleString()
+                      .split(",")[0]
+                  }}
+                </div>
+                <div class="pr-5 text-subtitle-2">
+                  {{
+                    new Date(tripDetail.tripEndDateTime)
+                      .toLocaleString()
+                      .split(",")[1]
+                  }}
+                </div>
+              </div>
             </v-card-text>
 
             <v-card-actions>
               <div class="d-flex flex-row justify-space-between w-100">
-                <v-btn color="blue darken-2">Pick Ride</v-btn>
+                <v-btn color="blue darken-2" @click="pickRide(tripDetail._id)">Pick Ride</v-btn>
+                <div class="pr-10">seats {{tripDetail.availableSeats}}</div>
                 <div class="text-h6 text-green pr-3">
                   ₹{{ tripDetail.pricePerSeat }}
                 </div>
@@ -271,10 +288,12 @@ export default {
 
   methods: {
     searchTrips() {
-      if (this.selectedFromLocation || this.selectedToLocation) {
+      if (!this.selectedFromLocation || !this.selectedToLocation) {
         this.snackbar = true;
         this.snackbarText = "please enter start and end point of your journey";
       } else {
+        if(this.date)
+          this.date = new Date(this.date).toISOString();
         const searchData = {
           search: true,
           date: this.date || new Date(),
@@ -284,6 +303,11 @@ export default {
         };
         this.setTrips(searchData);
       }
+    },
+
+    pickRide(tripId){
+      console.log("rideId method");
+      this.$router.push({name: 'trip-detail', params:{tripId}});
     },
 
     async setTrips(searchData) {

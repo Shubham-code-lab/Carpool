@@ -211,12 +211,18 @@ const store = createStore({
 
     async setTrips(context,payLoad) {
       console.log("action setTrips", payLoad);
-      await fetch("http://localhost:8080/rider/getTrips", {
+      await fetch("http://localhost:8080/guest/getTrips", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body:JSON.stringify({...payLoad})
+        body:JSON.stringify({
+          search: payLoad.search,
+          date: payLoad.date,
+          passengers: payLoad.passengers,
+          selectedFromLocation: payLoad.selectedFromLocation,
+          selectedToLocation: payLoad.selectedToLocation,
+        })
       })
       .then(res=>{
         if(res.status != 200){
@@ -238,7 +244,38 @@ const store = createStore({
       })
     },
 
-  },
+    async getTripDetail(context, payLoad){
+      console.log("action setTripDetail", payLoad);
+      return await fetch("http://localhost:8080/guest/getTripDetail", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body:JSON.stringify({
+          tripId: payLoad.tripId,
+        })
+      })
+      .then(res=>{
+        console.log("res", res);
+        if(res.status != 200){
+          const error = new Error("server error");
+          error.res = res;
+          throw error;
+        }
+        return res.json();
+      })
+      .then(resData=>{
+        console.log("Trip retrived successfully");
+        return resData.tripDetail;
+      })
+      .catch(error=>{
+        console.log(error);
+        return error.res.json().then(errData=>{
+          throw new Error(errData.message);
+        })
+      })
+    },
+}
 });
 
 export default store;

@@ -5,6 +5,8 @@ const auth = require('../middleware/is-auth.js');
 
 const router = express.Router();
 
-router.post('/getTrips', rider.getTrips);
+router.post('/bookTrip', auth, rider.bookTrip);
+
+// router.post('/getTripDetail', rider.getTripDetail);
 
 module.exports = router;

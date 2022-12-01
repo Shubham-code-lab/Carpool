@@ -7,6 +7,7 @@ const multer = require('multer');
 const authRoutes = require('./routes/auth');  //TODO
 const driverRoutes = require('./routes/driver');
 const riderRoutes = require('./routes/rider');
+const guestRoutes = require('./routes/guest');
 
 const app = express();
 
@@ -17,31 +18,6 @@ app.use((req, res, next) => {
     next();
 });
 
-
-//TODO :- MULTER CONFIGURATION
-// const fileStorage = multer.diskStorage({ //where to store file
-//     destination: (req, file, cb) => {  
-//       cb(null, 'images');      //store incoming image/file in images folder
-//     },
-//     filename: (req, file, cb) => { 
-//       cb(null, new Date().toISOString().replaceAll(':', '-') + file.originalname);  //store file/image with name
-//     }
-//   });
-  
-//   const fileFilter = (req, file, cb) => {
-//     if (           //only store when file is of below type otherwise reject
-//       file.mimetype === 'image/png' ||
-//       file.mimetype === 'image/jpg' ||
-//       file.mimetype === 'image/jpeg'
-//     ) {
-//       cb(null, true);
-//     } else {
-//       cb(null, false);
-//     }
-//   };
-
-// app.use(multer({ storage: fileStorage, fileFilter: fileFilter }).single('image'));  //image property on body of request
-
 app.use('/asset', express.static(path.join(__dirname, 'assets')));
 
 app.use(bodyParser.json()); // application/json
@@ -49,6 +25,7 @@ app.use(bodyParser.json()); // application/json
 app.use('/auth', authRoutes);
 app.use('/driver', driverRoutes);
 app.use('/rider', riderRoutes);
+app.use('/guest', guestRoutes);
 
 app.use((error, req, res, next)=>{  //custom error handling function
     const status = error.statusCode || 500;

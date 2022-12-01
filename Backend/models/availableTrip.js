@@ -28,6 +28,10 @@ const availableTripSchema = new Schema({
     type: Date,
     required: true,
   },
+  tripEndDateTime: {
+    type: Date,
+    required: true,
+  },
   availableSeats: {
     type: Number,
     required: true,
@@ -36,6 +40,18 @@ const availableTripSchema = new Schema({
     type: Number,
     required: true,
   },
+  bookedSeats:[
+    {
+      riderId:{
+        type: Schema.Types.ObjectId,
+        ref: "Rider",
+      },
+      totalSeats:{
+        type: Number,
+        required: true,
+      }
+    }
+  ]
 });
 
-module.exports = mongoose.model("availableTrip", availableTripSchema);
+module.exports = mongoose.model("AvailableTrip", availableTripSchema);

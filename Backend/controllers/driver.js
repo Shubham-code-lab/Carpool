@@ -126,6 +126,7 @@ exports.addTrip = (req, res, next) => {
   const fromLocationName = req.body.fromLocationName;
   const toLocationName = req.body.toLocationName;
   const tripDateTime = new Date(req.body.tripDateTime);
+  const tripEndDateTime = new Date(req.body.tripEndDateTime);
   const availableSeats = req.body.availableSeats;
   const pricePerSeat = req.body.pricePerSeat;
   const vehicalId = req.body.vehicalId;
@@ -177,15 +178,19 @@ exports.addTrip = (req, res, next) => {
           let validDate = true;
           let temp = [...existingAvailableTrips];    //mongoose return live document //so to prevent it :- it add new shedule and then loop that new schedule
           temp.forEach((existingAvailableTrip) => {
-            let existingTripDateMilliSecond = new Date(
+            let existingTripStartDateMilliSecond = new Date(
               existingAvailableTrip.tripDateTime
+            ).getTime();
+            let existingTripEndDateMilliSecond = new Date(
+              existingAvailableTrip.tripEndDateTime
             ).getTime();
             const oneDay = 1000 * 60 * 60 * 24;
             if (
               !(
-                +tripDateTime.getTime() >
-                  +existingTripDateMilliSecond + oneDay ||
-                +tripDateTime.getTime() < +existingTripDateMilliSecond - oneDay
+                (+tripDateTime.getTime() <
+                  +existingTripStartDateMilliSecond && +tripEndDateTime.getTime() < +existingTripStartDateMilliSecond) ||
+                  (+tripDateTime.getTime() >
+                  +existingTripEndDateMilliSecond && +tripEndDateTime.getTime() > +existingTripEndDateMilliSecond)
               )
             ) {
               validDate = false;
@@ -199,6 +204,7 @@ exports.addTrip = (req, res, next) => {
               fromLocationName,
               toLocationName,
               tripDateTime,
+              tripEndDateTime,
               availableSeats,
               pricePerSeat,
             });

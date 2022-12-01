@@ -70,8 +70,6 @@ const driver = {
       })
     },
 
-    
-    
     async setVehicals(context, payLoad) {
       //get vehical from server
       console.log("payload token set vehical", payLoad.token);

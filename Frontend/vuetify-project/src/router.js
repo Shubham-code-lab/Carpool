@@ -1,13 +1,20 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import NotFound from './Pages/NotFound.vue';
+
 import Home from './Pages/Home.vue';
 import FindRide from './Pages/FindRide.vue';
-import PublishRide from './Pages/PublishRide.vue';
-import RideHistory from './Pages/RideHistory.vue';
+import NotFound from './Pages/NotFound.vue';
+
 import Login from './Pages/auth/Login.vue';
 import Signup from './Pages/auth/Signup.vue';
-import AddVehical from  './Pages/RegisterVehical.vue';
-import RegisterTrip from './Pages/RegisterTrip.vue';
+
+import RideHistory from './Pages/rider/RideHistory.vue';
+import TripDetail from './Pages/rider/TripDetail.vue';
+
+import PublishRide from './Pages/driver/PublishRide.vue';
+import AddVehical from  './Pages/driver/RegisterVehical.vue';
+import RegisterTrip from './Pages/driver/RegisterTrip.vue';
+
+
 
 const routes = createRouter({
     history: createWebHistory(),
@@ -26,6 +33,7 @@ const routes = createRouter({
             ]
         },
         {path: '/reisterTrip/:vehicalId', name:'register-trip', component: RegisterTrip, props: true},
+        {path: '/tripDetail/:tripId', name:'trip-detail', component: TripDetail, props: true},
         {path: '/rideHistory', name:'ride-history', component: RideHistory},
         {path: '/:notFound(.*)', component: NotFound},
     ],
