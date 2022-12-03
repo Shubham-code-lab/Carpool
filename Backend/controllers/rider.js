@@ -73,6 +73,7 @@ exports.bookTrip = (req, res, next) => {
               riderExist = true;
               return {
                 riderId: user.riderId,
+                userId: user._id,
                 totalSeats: +bookedSeat.totalSeats + +passengers,
               }
             }
@@ -81,6 +82,7 @@ exports.bookTrip = (req, res, next) => {
         if(!riderExist){
           tripDetailVar.bookedSeats.push({
             riderId: rider._id,
+            userId: rider.userId,
             totalSeats: +passengers,
           });
         }
@@ -103,6 +105,13 @@ exports.bookTrip = (req, res, next) => {
         throw error;
       }
       if (+tripDetail.availableSeats <= 0) {
+        activeBookesSeats = tripDetail.bookedSeats.map(bookedSeat=>{   //setting active:false filed
+          return {
+            ...bookedSeat,
+            active:false,
+            
+          }
+        })
         const activeTrip = new ActiveTrip({
           vehicalId: tripDetail.vehicalId,
           driverId: tripDetail.driverId,
@@ -111,7 +120,8 @@ exports.bookTrip = (req, res, next) => {
           tripDateTime: tripDetail.tripDateTime,
           tripEndDateTime: tripDetail.tripEndDateTime,
           pricePerSeat: tripDetail.pricePerSeat,
-          bookedSeats: tripDetail.bookedSeats,
+          active:false,
+          bookedSeats: activeBookesSeats,
         });
         return activeTrip.save().then((activeTrip) => {
           if (!activeTrip) {
@@ -146,4 +156,88 @@ exports.bookTrip = (req, res, next) => {
       }
       next(err);
     });
+};
+
+exports.getActiveTrips = (req, res, next) => {
+  console.log("rider getActiveTrips");
+  const userId = req.userId;  
+  console.log(userId);
+  User.findById(userId)
+    .then((user) => {
+      if (!user) {
+        const err = new Error("User Doesn't exist");
+        err.statusCode = 404;
+        throw err;
+      }
+      console.log(user.riderId);
+      return ActiveTrip.find({ 'bookedSeats.riderId': user.riderId })
+        .populate("driverId")
+        .populate("vehicalId")
+        .populate("bookedSeats.riderId", "_id rating")
+        .populate("bookedSeats.userId", "_id firstName lastName email")
+    })
+    .then((activeTrips) => {
+      if (!activeTrips) {
+        const err = new Error("No ActiveTrip");
+        err.statusCode = 404;
+        throw err;
+      }
+      console.log(activeTrips);
+      // User.findById(activeTrips.driverId.userId)
+      // .then(user=>{
+        // let populatedActiveTrip = [...activeTrips,user];
+        // console.log(populatedActiveTrip);
+        
+      // })
+      res.status(200).json({ activeTrips });
+    })
+    .catch((err) => {
+      console.log(err.statusCode);
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
+    });
+};
+
+exports.startTrip = (req, res, next) => {
+  console.log("rider startTrip");
+  const tripId = req.body.tripId;
+  const userId = req.userId;
+  const activeToken = req.body.activeToken;
+  console.log("data recie",tripId,userId,activeToken);
+  ActiveTrip.findById(tripId)
+    .then((activeTrip) => {
+      if (!activeTrip) {
+        const err = new Error("Trip Doesn't exist");
+        err.statusCode = 404;
+        throw err;
+      }
+      console.log("activetrip", activeTrip)
+      const userBookedIndex =  activeTrip.bookedSeats.findIndex(currentBookedSeat=>{
+        return currentBookedSeat.userId.toString() === userId.toString(); 
+      })
+      if(activeTrip.bookedSeats[userBookedIndex].activeToken.toString() === activeToken.toString()){
+        activeTrip.bookedSeats[userBookedIndex].active = true;
+        activeTrip.active = true;
+      }
+      else{
+        const err = new Error("Invalid Token");
+        err.statusCode = 404;
+        throw err;
+      }
+      return activeTrip.save();
+    })
+    .then(activeTrip=>{
+      activeTrip.save();
+      res.status(200).json({ msg: "succesfully started" });
+    })
+    .catch((err) => {
+      console.log(err.statusCode);
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
+    });
+ 
 };

@@ -7,6 +7,10 @@ const router = express.Router();
 
 router.post('/bookTrip', auth, rider.bookTrip);
 
+router.get('/getActiveTrips', auth, rider.getActiveTrips);
+
+router.put('/startTrip', auth, rider.startTrip);
+
 // router.post('/getTripDetail', rider.getTripDetail);
 
 module.exports = router;

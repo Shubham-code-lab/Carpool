@@ -49,6 +49,10 @@ const availableTripSchema = new Schema({
       totalSeats:{
         type: Number,
         required: true,
+      },
+      userId:{
+        type: Schema.Types.ObjectId,
+        ref: "User",
       }
     }
   ]

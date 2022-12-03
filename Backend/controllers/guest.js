@@ -36,6 +36,13 @@ exports.getTrips = (req, res, next) => {
           +new Date(tripDetail.tripDateTime).getTime() <
           +new Date().getTime() + 1000 * 60 * 60
         ) {
+          activeBookesSeats = tripDetail.bookedSeats.map(bookedSeat=>{   //setting active:false filed
+            return {
+              ...bookedSeat,
+              active:false,
+           
+            }
+          })
           const activeTrip = new ActiveTrip({
             vehicalId: tripDetail.vehicalId,
             driverId: tripDetail.driverId,
@@ -44,7 +51,8 @@ exports.getTrips = (req, res, next) => {
             tripDateTime: tripDetail.tripDateTime,
             tripEndDateTime: tripDetail.tripEndDateTime,
             pricePerSeat: tripDetail.pricePerSeat,
-            bookedSeats: tripDetail.bookedSeats,
+            active:false,
+            bookedSeats: activeBookesSeats,
           });
           return await activeTrip.save().then(async (activeTrip) => {
             if (!activeTrip) {

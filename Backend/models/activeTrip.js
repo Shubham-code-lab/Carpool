@@ -32,6 +32,14 @@ const activeTripSchema = new Schema({
     type: Number,
     required: true,
   },
+
+
+  active:{
+    type:Boolean,
+    required:true,
+  },
+  
+
   bookedSeats:[
     {
       riderId:{
@@ -41,6 +49,18 @@ const activeTripSchema = new Schema({
       totalSeats:{
         type: Number,
         required: true,
+      },
+      userId:{
+        type: Schema.Types.ObjectId,
+        ref: "User",
+      },
+      active:{
+        type:Boolean,
+        required:true,
+      },
+      activeToken:{
+        type:String,
+        required:false,
       }
     }
   ]

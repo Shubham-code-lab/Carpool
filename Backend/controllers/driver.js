@@ -2,6 +2,22 @@ const User = require("../models/user");
 const Driver = require("../models/driver");
 const Vehical = require("../models/vehical");
 const AvailableTrip = require("../models/availableTrip");
+const ActiveTrip = require("../models/activeTrip");
+const activeTrip = require("../models/activeTrip");
+const crypto = require("crypto");
+
+const nodemailer = require("nodemailer");
+
+const transporter = nodemailer.createTransport(
+  //tell nodemailer how to deliver mail as nodejs don't send mail
+  {
+    service: "gmail",
+    auth: {
+      user: "shubhamhemant08@gmail.com", //follow bellow process to allow nodemailer to send email through email id having 2-step verifaction
+      pass: "ueylblefnlvyblnv", //https://stackoverflow.com/questions/45478293/username-and-password-not-accepted-when-using-nodemailer
+    },
+  }
+);
 
 exports.addVehicals = (req, res, next) => {
   console.log("addVehical");
@@ -176,7 +192,7 @@ exports.addTrip = (req, res, next) => {
             throw error;
           }
           let validDate = true;
-          let temp = [...existingAvailableTrips];    //mongoose return live document //so to prevent it :- it add new shedule and then loop that new schedule
+          let temp = [...existingAvailableTrips]; //mongoose return live document //so to prevent it :- it add new shedule and then loop that new schedule
           temp.forEach((existingAvailableTrip) => {
             let existingTripStartDateMilliSecond = new Date(
               existingAvailableTrip.tripDateTime
@@ -187,10 +203,11 @@ exports.addTrip = (req, res, next) => {
             const oneDay = 1000 * 60 * 60 * 24;
             if (
               !(
-                (+tripDateTime.getTime() <
-                  +existingTripStartDateMilliSecond && +tripEndDateTime.getTime() < +existingTripStartDateMilliSecond) ||
-                  (+tripDateTime.getTime() >
-                  +existingTripEndDateMilliSecond && +tripEndDateTime.getTime() > +existingTripEndDateMilliSecond)
+                (+tripDateTime.getTime() < +existingTripStartDateMilliSecond &&
+                  +tripEndDateTime.getTime() <
+                    +existingTripStartDateMilliSecond) ||
+                (+tripDateTime.getTime() > +existingTripEndDateMilliSecond &&
+                  +tripEndDateTime.getTime() > +existingTripEndDateMilliSecond)
               )
             ) {
               validDate = false;
@@ -210,7 +227,9 @@ exports.addTrip = (req, res, next) => {
             });
             return availableTrip.save();
           } else {
-            const error = new Error("PLease pick another date you have already have a trip schedule on corresponding date");
+            const error = new Error(
+              "PLease pick another date you have already have a trip schedule on corresponding date"
+            );
             error.statusCode = 403;
             throw error;
           }
@@ -221,8 +240,7 @@ exports.addTrip = (req, res, next) => {
             const err = new Error("ExistingAvailableTrips server error");
             err.statusCode = 500;
             throw err;
-          }else
-          throw err;
+          } else throw err;
         });
     })
     .then((newTripData) => {
@@ -235,4 +253,96 @@ exports.addTrip = (req, res, next) => {
       }
       next(err);
     });
+};
+
+exports.getActiveTrips = (req, res, next) => {
+  console.log("driver getActiveTrips");
+  const userId = req.userId;
+  User.findById(userId)
+    .then((user) => {
+      if (!user) {
+        const err = new Error("User Doesn't exist");
+        err.statusCode = 404;
+        throw err;
+      }
+      return ActiveTrip.find({ driverId: user.driverId })
+        .populate("driverId")
+        .populate("vehicalId")
+        .populate("bookedSeats.riderId", "_id rating")
+        .populate("bookedSeats.userId", "_id firstName lastName email");
+    })
+    .then(async (activeTrips) => {
+      if (!activeTrips) {
+        const err = new Error("No ActiveTrip");
+        err.statusCode = 204;
+        throw err;
+      }
+      res.status(200).json({ activeTrips });
+    })
+    .catch((err) => {
+      console.log(err.statusCode);
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
+    });
+};
+
+exports.startTrip = (req, res, next) => {
+  console.log("startTrip");
+  const tripId = req.body.tripId;
+  ActiveTrip.findById(tripId)
+  // .select("bookedSeats")
+    .populate("bookedSeats.userId", "email")
+    .then((activeTrip) => {
+      if (!activeTrip) {
+        const err = new Error("Trip Doesn't exist");
+        err.statusCode = 404;
+        throw err;
+      }
+      activeTrip.bookedSeats.forEach((bookedSeat) => {
+        const email = bookedSeat.userId.email;
+        crypto.randomBytes(32, (err, buffer) => {
+          if (err) {
+            console.log("could not generate crypto token", err);
+            const err = new Error("could not generate crypto token");
+            err.statusCode = 404;
+            throw err;
+          }
+          const token = buffer.toString("hex");
+
+          const currentBookedIndex =  activeTrip.bookedSeats.findIndex(currentBookedSeat=>{
+            return currentBookedSeat.userId.toString() === bookedSeat.userId.toString(); 
+          })
+          activeTrip.bookedSeats[currentBookedIndex].activeToken = token; 
+          transporter
+            .sendMail({
+              //we send mail
+              from: "shubhamhemant08@gmail.com",
+              to: email,
+              subject: "Token for ride!",
+              html: `
+          <p>Give this token to you driver to start the trip</p>
+          <h1>${token}</h1>
+          `,
+            })
+            .catch((err) => {
+              console.log("could not send mail", err);
+            });
+        });
+      });
+      return activeTrip.save();
+    })
+    .then(activeTrip=>{
+      activeTrip.save();
+      res.status(200).json({ msg: "succesfully started" });
+    })
+    .catch((err) => {
+      console.log(err.statusCode);
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
+    });
+ 
 };

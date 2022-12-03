@@ -75,6 +75,15 @@
           <router-link class="pa-4 d-block" :to="publishRide">
             Publish Ride
           </router-link>
+          <router-link class="pa-4 d-block" :to="activeDrive">
+            Active Drive
+          </router-link>
+          <router-link class="pa-4 d-block" :to="activeRide">
+            Active Ride
+          </router-link>
+          <router-link class="pa-4 d-block" :to="driveHistory">
+            Drive History
+          </router-link>
           <router-link class="pa-4 d-block" :to="rideHistory">
             Ride History
           </router-link>
@@ -143,6 +152,15 @@ export default {
     },
     rideHistory() {
       return { name: "ride-history" };
+    },
+    driveHistory() {
+      return { name: "drive-history" };
+    },
+    activeRide() {
+      return { name: "active-ride" };
+    },
+    activeDrive() {
+      return { name: "active-drive" };
     },
     login() {
       return { name: "login" };

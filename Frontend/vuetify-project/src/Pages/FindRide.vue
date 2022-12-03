@@ -88,7 +88,7 @@
             <v-card-text>
               <v-radio-group v-model="sort">
                 <div class="d-flex flex-row justify-space-between">
-                  <div class="pl-5 text-subtitle-2">
+                  <div class="pl-5">
                     <!-- <div>Lowest price</div> -->
                     <p
                       class="font-weight-light"
@@ -97,13 +97,13 @@
                       Lowest price
                     </p>
                   </div>
-                  <div class="pr-5 text-subtitle-2">
+                  <div class="pr-5">
                     <div><v-radio value="price"></v-radio></div>
                   </div>
                 </div>
 
                 <div class="d-flex flex-row justify-space-between">
-                  <div class="pl-5 text-subtitle-2">
+                  <div class="pl-5">
                     <p
                       class="font-weight-light"
                       style="font-size: 20px; line-height: 3em"
@@ -111,13 +111,13 @@
                       Earliest departure
                     </p>
                   </div>
-                  <div class="pr-5 text-subtitle-2">
+                  <div class="pr-5">
                     <div><v-radio value="time"></v-radio></div>
                   </div>
                 </div>
 
                 <div class="d-flex flex-row justify-space-between">
-                  <div class="pl-5 text-subtitle-2">
+                  <div class="pl-5 ">
                     <p
                       class="font-weight-light"
                       style="font-size: 20px; line-height: 3em"
@@ -125,13 +125,13 @@
                       Rating
                     </p>
                   </div>
-                  <div class="pr-5 text-subtitle-2">
+                  <div class="pr-5">
                     <div><v-radio value="rating"></v-radio></div>
                   </div>
                 </div>
 
                 <div class="d-flex flex-row justify-space-between">
-                  <div class="pl-5 text-subtitle-2">
+                  <div class="pl-5">
                     <p
                       class="font-weight-light"
                       style="font-size: 20px; line-height: 3em"
@@ -139,7 +139,7 @@
                       Available Seats
                     </p>
                   </div>
-                  <div class="pr-5 text-subtitle-2">
+                  <div class="pr-5">
                     <div><v-radio value="seat"></v-radio></div>
                   </div>
                 </div>
@@ -193,44 +193,62 @@
               </div>
             </v-card-subtitle>
             <v-card-text>
-              <div class="d-flex flex-row justify-space-between">
-                <div class="pl-5 text-subtitle-2">
-                  {{
-                    new Date(tripDetail.tripDateTime)
-                      .toLocaleString()
-                      .split(",")[0]
-                  }}
+              <div class="d-flex flex-row justify-space-around">
+                <div class="pr-4 seperator-right w-50 text-subtitle-2">
+                  <p class="text-center">start</p>
                 </div>
-                <div class="pr-5 text-subtitle-2">
-                  {{
-                    new Date(tripDetail.tripDateTime)
-                      .toLocaleString()
-                      .split(",")[1]
-                  }}
+                <div class="pl-4 seperator-left w-50 text-subtitle-2">
+                  <p class="text-center">End</p>
                 </div>
               </div>
               <div class="d-flex flex-row justify-space-between">
-                <div class="pl-5 text-subtitle-2">
-                  {{
-                    new Date(tripDetail.tripEndDateTime)
-                      .toLocaleString()
-                      .split(",")[0]
-                  }}
+                <div class="d-flex flex-row seperator-right w-50 justify-space-between">
+                  <div class="pl-5 text-subtitle-1">
+                    {{
+                      new Date(tripDetail.tripEndDateTime)
+                        .toLocaleString()
+                        .split(",")[0]
+                    }}
+                  </div>
+                  <div class="pr-5  text-subtitle-1">
+                    {{
+                      new Date(tripDetail.tripEndDateTime)
+                        .toLocaleString()
+                        .split(",")[1]
+                    }}
+                  </div>
                 </div>
-                <div class="pr-5 text-subtitle-2">
-                  {{
-                    new Date(tripDetail.tripEndDateTime)
-                      .toLocaleString()
-                      .split(",")[1]
-                  }}
+                <div class="d-flex seperator-left w-50 flex-row justify-space-between">
+                  <div class="pl-5 text-subtitle-1">
+                    {{
+                      new Date(tripDetail.tripDateTime)
+                        .toLocaleString()
+                        .split(",")[0]
+                    }}
+                  </div>
+                  <div class="pr-5 text-subtitle-1">
+                    {{
+                      new Date(tripDetail.tripDateTime)
+                        .toLocaleString()
+                        .split(",")[1]
+                    }}
+                  </div>
                 </div>
               </div>
             </v-card-text>
 
             <v-card-actions>
               <div class="d-flex flex-row justify-space-between w-100">
-                <v-btn color="blue darken-2" @click="pickRide(tripDetail._id)">Pick Ride</v-btn>
-                <div class="pr-10">seats {{tripDetail.availableSeats}}</div>
+                <v-btn color="blue darken-2" @click="pickRide(tripDetail._id)"
+                  >Pick Ride</v-btn
+                >
+                <div class="pr-10">
+                  <p class="text-center text-subtitle-2">Total Available Seats</p>
+                  <div>
+                    <p class="text-center text-subtitle-1">{{ tripDetail.availableSeats }}</p>
+                   
+                   </div>
+                </div>
                 <div class="text-h6 text-green pr-3">
                   ₹{{ tripDetail.pricePerSeat }}
                 </div>
@@ -292,8 +310,7 @@ export default {
         this.snackbar = true;
         this.snackbarText = "please enter start and end point of your journey";
       } else {
-        if(this.date)
-          this.date = new Date(this.date).toISOString();
+        if (this.date) this.date = new Date(this.date).toISOString();
         const searchData = {
           search: true,
           date: this.date || new Date(),
@@ -305,9 +322,9 @@ export default {
       }
     },
 
-    pickRide(tripId){
+    pickRide(tripId) {
       console.log("rideId method");
-      this.$router.push({name: 'trip-detail', params:{tripId}});
+      this.$router.push({ name: "trip-detail", params: { tripId } });
     },
 
     async setTrips(searchData) {
@@ -380,4 +397,10 @@ export default {
 </script>
 
 <style>
+.seperator-right {
+  border-right: 2px solid gray;
+}
+.seperator-left {
+  border-left: 2px solid gray;
+}
 </style>
