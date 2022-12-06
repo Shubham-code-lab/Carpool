@@ -24,7 +24,7 @@
               readonly
               size="small"
             ></v-rating>
-            <p>{{ tripDetail.driverId.rating }}</p>
+            <p>{{ tripDetail.driverId.rating.toFixed(1) }}</p>
           </div>
 
           <div class="d-flex">
@@ -230,7 +230,7 @@ export default {
         .dispatch("rider/bookTrip", {passengers : this.passengers, tripId:this.tripId, token:this.getToken})
         .then((result) => {
             console.log(result);
-            this.$router.push({name:'home'});
+            this.$router.push({name:'schedule-ride'});
         })
         .catch((err) => {
           console.log("can't book Trip", err);

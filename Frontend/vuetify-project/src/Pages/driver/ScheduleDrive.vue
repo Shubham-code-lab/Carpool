@@ -11,7 +11,7 @@
             {{ index }}
           </div>
         </div>
-        <v-expansion-panels variant="accordion">
+        <v-expansion-panels multiple variant="accordion">
           <v-expansion-panel
             v-for="tripDetail in activeTrips"
             :key="tripDetail._id"
@@ -122,12 +122,8 @@
                     </p>
                   </div>
                 </div>
-
                 <div class="w-100 d-flex justify-center mt-4">
-                  <div class="w-50">
-                    <v-text-field clearable label="Enter Token" class="pa-4" v-model="activeToken"></v-text-field>
-                    </div>
-                    <v-btn color="blue darken-2 mt-7" @click="startTrip(tripDetail._id)">Start Trip</v-btn>
+                    <v-btn color="blue darken-2" @click="startTrip(tripDetail._id)">Start Trip</v-btn>
                 </div>
               </div>
             </v-expansion-panel-text>
@@ -161,7 +157,6 @@ export default {
       activeTrips: [],
       snackbar: false,
       snackbarText: ``,
-      activeToken: null,
     };
   },
   computed: {
@@ -169,7 +164,7 @@ export default {
   },
   async created() {
     await this.$store
-      .dispatch("rider/getActiveTrips", { token: this.getToken })
+      .dispatch("driver/getScheduleTrips", { token: this.getToken })
       .then((activeTrips) => {
         console.log(activeTrips);
         this.activeTrips = activeTrips;
@@ -182,14 +177,9 @@ export default {
   },
   methods:{
     async startTrip(tripId){
-      if( !this.activeToken || this.activeToken.length < 0){
-          this.snackbar = true;
-          this.snackbarText = "please enter token";
-          return;
-      }
       console.log(tripId);
       await this.$store
-        .dispatch("rider/startTrip", {tripId, token: this.getToken, activeToken: this.activeToken})
+        .dispatch("driver/startTrip", {tripId, token: this.getToken})
         .then((result) => {
             console.log(result);
             this.$router.push({name:'home'});

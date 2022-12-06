@@ -255,7 +255,7 @@ exports.addTrip = (req, res, next) => {
     });
 };
 
-exports.getActiveTrips = (req, res, next) => {
+exports.getScheduleTrips = (req, res, next) => {
   console.log("driver getActiveTrips");
   const userId = req.userId;
   User.findById(userId)
@@ -277,7 +277,8 @@ exports.getActiveTrips = (req, res, next) => {
         err.statusCode = 204;
         throw err;
       }
-      res.status(200).json({ activeTrips });
+      filteredActiveTrips = activeTrips.filter(activeTrip=>!activeTrip.active)
+      res.status(200).json({ activeTrips:filteredActiveTrips });
     })
     .catch((err) => {
       console.log(err.statusCode);

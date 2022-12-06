@@ -9,7 +9,7 @@ router.post('/addVehical', auth, driver.addVehicals);
 
 router.get('/getVehicals', auth, driver.getVehicals);
 
-router.get('/getActiveTrips', auth, driver.getActiveTrips);
+router.get('/getScheduleTrips', auth, driver.getScheduleTrips);
 
 router.post('/addTrip', auth, driver.addTrip);
 

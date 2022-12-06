@@ -9,7 +9,7 @@ const driverSchema = new Schema({
     },
     rating:{
         type: Number,
-        default: 0
+        default: 1
     },
     feedBack:[
         {

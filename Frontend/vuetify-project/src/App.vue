@@ -72,14 +72,18 @@
           <router-link class="pa-4 d-block" :to="findRideLink">
             Find Ride
           </router-link>
+          <div v-if="getUserIsAuthenticated">
           <router-link class="pa-4 d-block" :to="publishRide">
             Publish Ride
           </router-link>
-          <router-link class="pa-4 d-block" :to="activeDrive">
-            Active Drive
+          <router-link class="pa-4 d-block" :to="scheduleDrive">
+            Schedule Drive
           </router-link>
-          <router-link class="pa-4 d-block" :to="activeRide">
-            Active Ride
+          <router-link class="pa-4 d-block" :to="scheduleRide">
+            Schedule Ride
+          </router-link>
+          <router-link class="pa-4 d-block" :to="activeTrip">
+            Active Trip
           </router-link>
           <router-link class="pa-4 d-block" :to="driveHistory">
             Drive History
@@ -87,6 +91,7 @@
           <router-link class="pa-4 d-block" :to="rideHistory">
             Ride History
           </router-link>
+          </div>
         </div>
       </v-navigation-drawer>
 
@@ -156,11 +161,14 @@ export default {
     driveHistory() {
       return { name: "drive-history" };
     },
-    activeRide() {
-      return { name: "active-ride" };
+    scheduleRide() {
+      return { name: "schedule-ride" };
     },
-    activeDrive() {
-      return { name: "active-drive" };
+    scheduleDrive() {
+      return { name: "schedule-drive" };
+    },
+    activeTrip() {
+      return { name: "active-trip" };
     },
     login() {
       return { name: "login" };

@@ -139,9 +139,9 @@ const driver = {
         });
     },
 
-    async getActiveTrips(context, payLoad){
-      console.log("driver action getActiveTrips", payLoad);
-      return await fetch("http://localhost:8080/driver/getActiveTrips", {
+    async getScheduleTrips(context, payLoad){
+      console.log("driver action getScheduleTrips", payLoad);
+      return await fetch("http://localhost:8080/driver/getScheduleTrips", {
         method: "get",
         headers: {
           Authorization: "Bearer " + payLoad.token,

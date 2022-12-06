@@ -175,7 +175,7 @@
                   ></v-rating>
 
                   <div class="text-grey ml-2 text-subtitle-2 pt-2">
-                    {{ tripDetail.driverId.rating }}
+                    {{ tripDetail.driverId.rating.toFixed(1) }}
                   </div>
                 </div>
               </div>

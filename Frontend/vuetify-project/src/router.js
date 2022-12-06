@@ -9,13 +9,16 @@ import Login from './Pages/auth/Login.vue';
 import Signup from './Pages/auth/Signup.vue';
 
 import RideHistory from './Pages/rider/RideHistory.vue';
-import ActiveRide from './Pages/rider/ActiveRide.vue';
+import ScheduleRide from './Pages/rider/ScheduleRide.vue';
 
 import PublishRide from './Pages/driver/PublishRide.vue';
 import AddVehical from  './Pages/driver/RegisterVehical.vue';
 import RegisterTrip from './Pages/driver/RegisterTrip.vue';
-import ActiveDrive from './Pages/driver/ActiveDrive.vue';
+import ScheduleDrive from './Pages/driver/ScheduleDrive.vue';
 import DriveHistory from './Pages/driver/DriveHistory.vue';
+
+import ActiveTrip from './Pages/ActiveTrip.vue';
+import RateUser from './Pages/RateUser.vue';
 
 
 
@@ -41,8 +44,11 @@ const routes = createRouter({
         {path: '/reisterTrip/:vehicalId', name:'register-trip', component: RegisterTrip, props: true},
         {path: '/tripDetail/:tripId', name:'trip-detail', component: TripDetail, props: true},
 
-        {path: '/ActiveRide', name:'active-ride', component: ActiveRide},
-        {path: '/ActiveDrive', name:'active-drive', component: ActiveDrive},
+        {path: '/scheduleRide', name:'schedule-ride', component: ScheduleRide},
+        {path: '/sheduleDrive', name:'schedule-drive', component: ScheduleDrive},
+
+        {path: '/activeTrip', name:'active-trip', component: ActiveTrip},
+        {path: '/rateUser/:id', name:'rate-user', component: RateUser, props: true},
 
         {path: '/rideHistory', name:'ride-history', component: RideHistory},
         {path: '/driveHistory', name:'drive-history', component: DriveHistory},
